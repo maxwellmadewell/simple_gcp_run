@@ -27,7 +27,9 @@ app = Flask(__name__)
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
-    return 'Hello World max at 11!'
+
+    cslist = list_blobs("needtoupdate")
+    return 'Hello World max at 11!' + cslist
 
 @app.route("/", methods=["POST"])
 def index():
@@ -66,11 +68,22 @@ def index():
             print(f"error: {msg}")
             return f"Bad Request: {msg}", 400
 
-
-
     return ("", 500)
     # [END run_imageproc_controller]
     # [END cloudrun_imageproc_controller]
+
+
+def list_blobs(bucket_name):
+    """Lists all the blobs in the bucket."""
+    # bucket_name = "your-bucket-name"
+
+    storage_client = storage.Client()
+
+    # Note: Client.list_blobs requires at least package version 1.17.0.
+    blobs = storage_client.list_blobs("mxm-predeng-input")
+    return str(blobs)
+#    for blob in blobs:
+#        print(blob.name)
 
 
 if __name__ == "__main__":
