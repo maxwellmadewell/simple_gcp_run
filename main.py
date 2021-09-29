@@ -20,7 +20,6 @@ import os
 
 from flask import Flask, request
 
-import image
 
 
 app = Flask(__name__)
@@ -67,13 +66,7 @@ def index():
             print(f"error: {msg}")
             return f"Bad Request: {msg}", 400
 
-        try:
-            image.blur_offensive_images(data)
-            return ("", 204)
 
-        except Exception as e:
-            print(f"error: {e}")
-            return ("", 500)
 
     return ("", 500)
     # [END run_imageproc_controller]
