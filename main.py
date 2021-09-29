@@ -43,7 +43,7 @@ def hello():
     try:
         r = requests.get(url)
         r_data = r.json()
-        openstr = r_data
+        openstr = str(r_data)
 
     except Exception as err:
         print(f'Other error occurred: {err}')
