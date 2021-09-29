@@ -1,21 +1,18 @@
-FROM python:3.9
+FROM ubuntu:18.04
 
-ENV PYTHONUNBUFFERED True
+RUN apt-get update
+RUN apt-get install -y gnupg lsb-release wget
+#COPY ./gcp/creds.json /etc/
+#ENV GOOGLE_APPLICATION_CREDENTIALS=/etc/creds.json
 
-# Copy application dependency manifests to the container image.
-COPY requirements.txt ./
+RUN lsb_release -c -s > /tmp/lsb_release
+RUN GCSFUSE_REPO=$(cat /tmp/lsb_release); echo "deb http://packages.cloud.google.com/apt gcsfuse-$GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list
+RUN wget -O - https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-# Install production dependencies.
-RUN pip install -r requirements.txt
+RUN apt-get update
+RUN apt-get install -y gcsfuse
 
-# Copy local code to the container image.
-ENV APP_HOME /app
-WORKDIR $APP_HOME
-COPY . ./
-
-# Run the web service on container startup.
-# Use gunicorn webserver with one worker process and 8 threads.
-# For environments with multiple CPU cores, increase the number of workers
-# to be equal to the cores available.
-# Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
+RUN mkdir scripts
+COPY mountgcs.sh /scripts/mountgcs.sh
+RUN chmod +x /scripts/mountgcs.sh
+ENTRYPOINT ["bin/bash", "/scripts/mountgcs.sh"]
