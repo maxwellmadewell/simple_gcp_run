@@ -24,12 +24,17 @@ from google.cloud import storage
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
+    storage_client = storage.Client()
+    blobs = storage_client.list_blobs("mxm-predeng-input")
+    csstring = ""
+    for blob in blobs:
+        csstring += str(blob)
+    return 'Hello World max at 11!' + csstring + "Missing anything?"
 
-    cslist = list_blobs("needtoupdate")
-    return 'Hello World max at 11!' + cslist
 
 @app.route("/", methods=["POST"])
 def index():
