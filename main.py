@@ -17,6 +17,8 @@
 import base64
 import json
 import os
+import requests
+
 
 from flask import Flask, request
 from google.cloud import storage
@@ -31,9 +33,24 @@ def hello():
     storage_client = storage.Client()
     blobs = storage_client.list_blobs("mxm-predeng-input")
     csstring = ""
+
     for blob in blobs:
         csstring += str(blob.name)
-    return 'Hello World max at 11!' + csstring + "Missing anything?"
+    api_key = os.environ.get('OPENSKY')
+    city = "Nashville"
+    url = 'https://api.openweathermap.org/data/2.5/weather?q={}&appid={}'.format(city, api_key)
+    openstr = ""
+    try:
+        r = requests.get(url)
+        r_data = r.json()
+        openstr = r_data
+
+    except Exception as err:
+        print(f'Other error occurred: {err}')
+
+    return 'Input File List' + csstring + "\nOpenSkyData: " + openstr
+
+
 
 
 @app.route("/", methods=["POST"])
