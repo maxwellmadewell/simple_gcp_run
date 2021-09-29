@@ -32,7 +32,7 @@ def hello():
     blobs = storage_client.list_blobs("mxm-predeng-input")
     csstring = ""
     for blob in blobs:
-        csstring += str(blob)
+        csstring += str(blob.name)
     return 'Hello World max at 11!' + csstring + "Missing anything?"
 
 
